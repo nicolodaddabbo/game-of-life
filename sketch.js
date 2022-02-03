@@ -1,5 +1,3 @@
-/// <reference path="p5.global-mode.d.ts" />
-
 let scl = 20;
 let grid;
 let generation = 0;
