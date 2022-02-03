@@ -4,47 +4,97 @@ let scl = 20;
 let grid;
 let generation = 0;
 let canvas;
-let h1;
-let button;
+let restartButton;
+let restart = false;
 
 function setup() {
-	canvas = createCanvas(600, 600);
-	canvas.position(0, 0);
-	h1 = createElement('h1', 'Generation:');
-	h1.position(650, 0);
+	canvas = createCanvas(windowWidth, windowWidth);
+	canvas.parent('game-of-life');
 
-	button = createButton('Next Gen')
-	button.position(650, 100);
+	restartButton = createButton('Restart');
+	restartButton.parent('restart');
+	restartButton.mouseClicked(() => restart = true);
 	
-	button.mouseClicked(test);
-
 	grid = new Grid();
 	grid.createGrid();
-	grid.aliveCell(5, 5);
-	grid.aliveCell(6, 4);
-	grid.aliveCell(6, 5);
-	grid.aliveCell(7, 5);
-	frameRate(2);
+	restartGame();
 
-	// TEST 
-	
-	grid.show();
-	
+	frameRate(10);
 }
 
-function test() {
-	checkCells();
-	nextGen();
+function restartGame() {
+	grid.recreateGrid();
+
+	/* tetromino pattern */
+	// grid.aliveCell(5, 5);
+	// grid.aliveCell(6, 4);
+	// grid.aliveCell(6, 5);
+	// grid.aliveCell(7, 5);
+
+	/* gosper glider gun */
+	// first square
+	grid.aliveCell(2, 6);
+	grid.aliveCell(2, 7);
+	grid.aliveCell(3, 6);
+	grid.aliveCell(3, 7);
+
+	// first shot
+	grid.aliveCell(12, 6);
+	grid.aliveCell(13, 5);
+	grid.aliveCell(14, 4);
+	grid.aliveCell(15, 4);
+	grid.aliveCell(17, 5);
+	grid.aliveCell(18, 6);
+	grid.aliveCell(16, 7);
+	grid.aliveCell(18, 7);
+	grid.aliveCell(19, 7);
+	grid.aliveCell(18, 8);
+	grid.aliveCell(17, 9);
+	grid.aliveCell(15, 10);
+	grid.aliveCell(14, 10);
+	grid.aliveCell(13, 9);
+	grid.aliveCell(12, 8);
+	grid.aliveCell(12, 7);
+
+	// second shot
+	grid.aliveCell(22, 4);
+	grid.aliveCell(23, 4);
+	grid.aliveCell(24, 3);
+	grid.aliveCell(26, 3);
+	grid.aliveCell(26, 2);
+	grid.aliveCell(26, 7);
+	grid.aliveCell(26, 8);
+	grid.aliveCell(24, 7);
+	grid.aliveCell(23, 6);
+	grid.aliveCell(22, 6);
+	grid.aliveCell(23, 5);
+	grid.aliveCell(22, 5);
+
+	// second square
+	grid.aliveCell(36, 4);
+	grid.aliveCell(37, 4);
+	grid.aliveCell(36, 5);
+	grid.aliveCell(37, 5);
+
+	
 	grid.show();
-	generation++;
 }
 
 function draw() {
-	h1.html('Generation: ' + generation)
-	checkCells();
-	nextGen();
-	grid.show();
-	generation++;
+	if (restart) {
+		restartGame();
+		restart = false;
+	} else {
+		checkCells();
+		nextGen();
+		grid.show();
+		// generation++;
+	}
+}
+
+function windowResized() { 
+	canvas = resizeCanvas(windowWidth, windowWidth);
+	canvas.parent('game-of-life');
 }
 
 /* Qualsiasi cella viva con meno di due celle vive adiacenti muore, come per effetto d'isolamento;
@@ -83,12 +133,12 @@ function Cell() {
 	this.neighbour = 0;
 
 	this.show = () => {
-		stroke(0);
+		stroke(255);
 
 		if (this.isAlive)
-			fill(0);
+			fill(187, 101, 247);
 		else
-			fill(255);
+			fill(0);
 
 		rect(this.x * scl, this.y * scl, scl, scl);
 	}
@@ -107,7 +157,16 @@ function Grid() {
 	this.zero = () => {
 		for (let i = 0; i < this.elements.length - 1; i++) {
 			for (let j = 0; j < this.elements[i].length - 1; j++) {
-				this.elements[i].neighbour = 0;
+				this.elements[i][j].neighbour = 0;
+			}
+		}
+	}
+
+	this.recreateGrid = () => {
+		for (let i = 0; i < this.elements.length - 1; i++) {
+			for (let j = 0; j < this.elements[i].length - 1; j++) {
+				this.elements[i][j].neighbour = 0;
+				this.elements[i][j].isAlive = false;
 			}
 		}
 	}
